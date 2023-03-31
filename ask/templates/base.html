@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en"  data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.*/css/pico.min.css">
+    <title>simple hackernews</title>
+</head>
+<body>
+    {% include 'navbar.html' %}
+    <div class="container">
+        
+      <br/>
+      {% if messages %}
+        {% for message in messages %}
+        <details>
+            <summary>Accordion 1</summary>
+            <p>{{message}}</p>
+          </details>
+        {% endfor %}
+      {% endif %}
+      
+      {% block content %}
+      {% endblock%}
+    </div>
+</body>
+</html>

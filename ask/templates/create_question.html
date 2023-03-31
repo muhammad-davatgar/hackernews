@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>create question</h1>
+
+<form method="POST" action="">
+	{% csrf_token %}
+	{% if form.errors %}
+			<div role="alert">
+			  Your Form Has Errors
+			  {% for field in form %}
+			  	{% if field.errors %}
+			  		{{ field.errors }}
+			  	{% endif %}
+			  {% endfor %}
+			</div>
+		{% endif %}
+
+	{{ form.as_p }}
+
+	<br/>
+	  <button type="submit">Post question</button>
+	</form>
+
+{% endblock %}
