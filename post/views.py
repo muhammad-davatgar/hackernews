@@ -3,21 +3,21 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.contrib import messages
 from . import models
-from .forms import QuestionForm, AnswerForm
+from .forms import PostForm, CommentForm
 # Create your views here.
 
 
 def all_questions(request):
-    data = {"questions": models.Question.objects.all()}
+    data = {"questions": models.Post.objects.all()}
     return render(request, 'all_questions.html', data)
 
 
 def create_question(request) -> HttpResponse:
     if request.method == "GET":
-        form = QuestionForm()
+        form = PostForm()
         return render(request, "create_question.html", {"form": form})
     elif request.method == "POST":
-        form = QuestionForm(request.POST)
+        form = PostForm(request.POST)
         if form.is_valid():
             form.save()
         return redirect("all_questions")
@@ -27,27 +27,30 @@ def create_question(request) -> HttpResponse:
 
 def single_question(request, id) -> HttpResponse:
     if request.method == "GET":
-        question = get_object_or_404(models.Question, pk=id)
-        answers = models.Answer.objects.order_by("created_at")
-        form = AnswerForm()
+        question = get_object_or_404(models.Post, pk=id)
+        answers = models.Comment.objects.order_by("created_at")
+        form = CommentForm()
         return render(request, "single_question.html", {"question": question, "answers": answers, "form": form})
     elif request.method == "POST":
         try:
-            reply = models.Answer()
+            reply = models.Comment()
             if request.POST.get('reply') == '0':
                 reply = None
+                print("here")
             else:
+                print("three")
                 try:
-                    reply = models.Answer.objects.get(pk=id)
-                except models.Answer.DoesNotExist:
-                    messages.success(request, 'invalid form')
+                    reply = models.Comment.objects.get(
+                        pk=request.POST['reply'])
+                except (KeyError, models.Comment.DoesNotExist):
+                    messages.error(request, 'invalid form')
                     return HttpResponseBadRequest()
 
             text = request.POST['text']
-            question = get_object_or_404(models.Question, pk=id)
-            answer = models.Answer(text=text, question=question, reply=reply)
+            question = get_object_or_404(models.Post, pk=id)
+            answer = models.Comment(text=text, question=question, reply=reply)
             answer.save()
-            return redirect(f'/ask/{id}/')
+            return redirect(f'/post/ask/{id}/')
         except KeyError:
             messages.error(request, 'invalid form')
             return HttpResponseBadRequest()
